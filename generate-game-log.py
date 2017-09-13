@@ -15,9 +15,10 @@ def get_time():
 env = Environment(loader=FileSystemLoader('./', encoding='utf8'))
 msg_tpl = env.get_template('template.json')
 
-msg_body = {}
+# Platform List
 platform_list = ["web", "ios", "android"]
 
+# Generate log with json format
 for i in range(1, 10):
     platform = random.choice(platform_list)
     event_code = 'event' + "%02d" % (random.randint(1,99))
