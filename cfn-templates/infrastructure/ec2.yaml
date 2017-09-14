@@ -1,5 +1,5 @@
 Description: >
-  This templates deploys Game Server to the provided VPC and subnet.
+  This templates deploys a Game Server to the provided VPC and subnet.
 
 Parameters:
 
@@ -16,7 +16,7 @@ Parameters:
       Description: Choose which VPC this Game Server should be deployed to
       Type: AWS::EC2::VPC::Id
 
-  Subnet:
+  PublicSubnet1:
       Description: Choose which subnets this Game Server should be deployed to
       Type: AWS::EC2::Subnet::Id
 
@@ -69,19 +69,22 @@ Resources:
       SecurityGroupIds: [ !Ref EC2SecurityGroup ]
       KeyName: !Ref KeyName
       ImageId: !FindInMap [AWSRegionToAMI, !Ref "AWS::Region", AMI]
-      SubnetId: !Ref Subnet
+      SubnetId: !Ref PublicSubnet1
       Tags:
         -
           Key: Name
           Value: game-server
 
 Outputs:
+
   InstanceId:
     Description: InstanceId of the newly created EC2 instance
     Value: !Ref 'EC2Instance'
+
   PublicDNS:
     Description: Public DNSName of the newly created EC2 instance
     Value: !GetAtt [EC2Instance, PublicDnsName]
+
   PublicIP:
     Description: Public IP address of the newly created EC2 instance
     Value: !GetAtt [EC2Instance, PublicIp]

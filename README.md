@@ -1,1 +1,1 @@
-# Game Analytics Handson
+# AWS Hands On - Game Analytics Platform

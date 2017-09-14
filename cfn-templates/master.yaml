@@ -1,9 +1,9 @@
 Description: >
 
     This template deploys a VPC, with a pair of public and private subnets, and
-    a game server and a MySQL RDS instance for Game Analytics Hands On.
+    a game server and a database (MySQL) for Game Analytics Hands On.
 
-    Last Modified: Sep 13, 2017
+    Last Modified: Sep 15, 2017
     Author: Hideyo Yoshida <hideyy@amazon.co.jp>
 
 Parameters:
@@ -31,7 +31,6 @@ Parameters:
     Type: String
     MinLength: '1'
     MaxLength: '41'
-    AllowedPattern: '[a-zA-Z0-9]+'
     ConstraintDescription: must contain only alphanumeric characters.
 
 
@@ -43,9 +42,11 @@ Resources:
             TemplateURL: https://s3.amazonaws.com/game-analytics-handson-jp/infrastructure/vpc.yaml
             Parameters:
                 EnvironmentName:    !Ref AWS::StackName
-                VpcCIDR:            10.200.0.0/16
-                PublicSubnetCIDR:   10.200.1.0/24
-                PrivateSubnetCIDR:  10.200.11.0/24
+                VpcCIDR:            10.180.0.0/16
+                PublicSubnet1CIDR:  10.180.1.0/24
+                PublicSubnet2CIDR:  10.180.2.0/24
+                PrivateSubnet1CIDR: 10.180.11.0/24
+                PrivateSubnet2CIDR: 10.180.12.0/24
 
     SecurityGroups:
         Type: AWS::CloudFormation::Stack
@@ -54,7 +55,6 @@ Resources:
             Parameters:
                 EnvironmentName: !Ref AWS::StackName
                 VPC: !GetAtt VPC.Outputs.VPC
-                PrivateSubnetCIDR: !GetAtt VPC.Outputs.PrivateSubnetCIDR
 
     EC2Instance:
         Type: AWS::CloudFormation::Stack
@@ -64,7 +64,7 @@ Resources:
                 EnvironmentName: !Ref AWS::StackName
                 InstanceType: t2.micro
                 VPC: !GetAtt VPC.Outputs.VPC
-                Subnet: !GetAtt VPC.Outputs.PublicSubnet
+                PublicSubnet1: !GetAtt VPC.Outputs.PublicSubnet1
                 EC2SecurityGroup: !GetAtt SecurityGroups.Outputs.EC2SecurityGroup
                 KeyName: !Ref KeyName
 
@@ -74,8 +74,9 @@ Resources:
             TemplateURL: https://s3.amazonaws.com/game-analytics-handson-jp/infrastructure/rds.yaml
             Parameters:
                 EnvironmentName: !Ref AWS::StackName
-                DBSecurityGroup: !GetAtt SecurityGroups.Outputs.DBSecurityGroup
-                PrivateSubnet: !GetAtt VPC.Outputs.PrivateSubnet
+                VPC: !GetAtt VPC.Outputs.VPC
+                EC2SecurityGroup: !GetAtt SecurityGroups.Outputs.EC2SecurityGroup
+                PrivateSubnets: !GetAtt VPC.Outputs.PrivateSubnets
                 DBUser: !Ref DBUser
                 DBPassword: !Ref DBPassword
 
