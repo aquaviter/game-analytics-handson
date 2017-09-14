@@ -1,0 +1,87 @@
+Description: >
+  This templates deploys Game Server to the provided VPC and subnet.
+
+Parameters:
+
+  EnvironmentName:
+      Description: An environment name that will be prefixed to resource names
+      Type: String
+
+  InstanceType:
+      Description: Which instance type should we use to build Game Server?
+      Type: String
+      Default: t2.micro
+
+  VPC:
+      Description: Choose which VPC this Game Server should be deployed to
+      Type: AWS::EC2::VPC::Id
+
+  Subnet:
+      Description: Choose which subnets this Game Server should be deployed to
+      Type: AWS::EC2::Subnet::Id
+
+  EC2SecurityGroup:
+      Description: Select the Security Group to use for Game Server
+      Type: AWS::EC2::SecurityGroup::Id
+
+  KeyName:
+      Description: KeyName for logging into Game Server
+      Type: String
+
+Mappings:
+
+    AWSRegionToAMI:
+      ap-northeast-1:
+        AMI: ami-4af5022c
+      ap-northeast-2:
+        AMI: ami-8663bae8
+      ap-south-1:
+        AMI: ami-d7abd1b8
+      ap-southeast-1:
+        AMI: ami-fdb8229e
+      ap-southeast-2:
+        AMI: ami-30041c53
+      eu-west-1:
+        AMI: ami-ebd02392
+      eu-west-2:
+        AMI: ami-489f8e2c
+      eu-central-1:
+        AMI: ami-657bd20a
+      sa-east-1:
+        AMI: ami-d27203be
+      us-east-1:
+        AMI: ami-4fffc834
+      us-east-2:
+        AMI:  ami-ea87a78f
+      us-west-1:
+        AMI: ami-3a674d5a
+      us-west-2:
+        AMI: ami-aa5ebdd2
+      ca-central-1:
+        AMI: ami-5ac17f3e
+
+Resources:
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone: !Select [ 0, !GetAZs ]
+      InstanceType: !Ref InstanceType
+      SecurityGroupIds: [ !Ref EC2SecurityGroup ]
+      KeyName: !Ref KeyName
+      ImageId: !FindInMap [AWSRegionToAMI, !Ref "AWS::Region", AMI]
+      SubnetId: !Ref Subnet
+      Tags:
+        -
+          Key: Name
+          Value: game-server
+
+Outputs:
+  InstanceId:
+    Description: InstanceId of the newly created EC2 instance
+    Value: !Ref 'EC2Instance'
+  PublicDNS:
+    Description: Public DNSName of the newly created EC2 instance
+    Value: !GetAtt [EC2Instance, PublicDnsName]
+  PublicIP:
+    Description: Public IP address of the newly created EC2 instance
+    Value: !GetAtt [EC2Instance, PublicIp]

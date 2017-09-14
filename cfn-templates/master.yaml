@@ -1,0 +1,63 @@
+Description: >
+
+    This template deploys a VPC, with a pair of public and private subnets, and
+    a game server and a MySQL RDS instance for Game Analytics Hands On.
+
+    Last Modified: Sep 13, 2017
+    Author: Hideyo Yoshida <hideyy@amazon.co.jp>
+
+Parameters:
+
+  KeyName:
+    Description: EC2 key pair name for bastion host SSH access
+    Type: String
+    MinLength: 1
+    MaxLength: 255
+    AllowedPattern: "[\\x20-\\x7E]*"
+    ConstraintDescription: Key pair name can contain only ASCII characters.
+
+Resources:
+
+    VPC:
+        Type: AWS::CloudFormation::Stack
+        Properties:
+            TemplateURL: https://s3.amazonaws.com/game-analytics-handson-jp/infrastructure/vpc.yaml
+            Parameters:
+                EnvironmentName:    !Ref AWS::StackName
+                VpcCIDR:            10.200.0.0/16
+                PublicSubnetCIDR:   10.200.1.0/24
+                PrivateSubnetCIDR:  10.200.11.0/24
+
+    SecurityGroups:
+        Type: AWS::CloudFormation::Stack
+        Properties:
+            TemplateURL: https://s3.amazonaws.com/game-analytics-handson-jp/infrastructure/security-groups.yaml
+            Parameters:
+                EnvironmentName: !Ref AWS::StackName
+                VPC: !GetAtt VPC.Outputs.VPC
+
+    EC2Instance:
+        Type: AWS::CloudFormation::Stack
+        Properties:
+            TemplateURL: https://s3.amazonaws.com/game-analytics-handson-jp/infrastructure/ec2.yaml
+            Parameters:
+                EnvironmentName: !Ref AWS::StackName
+                InstanceType: t2.micro
+                VPC: !GetAtt VPC.Outputs.VPC
+                Subnet: !GetAtt VPC.Outputs.PublicSubnet
+                EC2SecurityGroup: !GetAtt SecurityGroups.Outputs.EC2SecurityGroup
+                KeyName: !Ref KeyName
+
+Outputs:
+
+  InstanceId:
+    Description: InstanceId of the newly created EC2 instance
+    Value: !GetAtt EC2Instance.Outputs.InstanceId
+
+  PublicDNS:
+    Description: Public DNSName of the newly created EC2 instance
+    Value: !GetAtt EC2Instance.Outputs.PublicDNS
+
+  PublicIP:
+    Description: Public IP address of the newly created EC2 instance
+    Value: !GetAtt EC2Instance.Outputs.PublicIP
