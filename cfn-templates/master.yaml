@@ -16,6 +16,25 @@ Parameters:
     AllowedPattern: "[\\x20-\\x7E]*"
     ConstraintDescription: Key pair name can contain only ASCII characters.
 
+  DBUser:
+    Description: The database admin account username
+    Type: String
+    MinLength: '1'
+    MaxLength: '16'
+    AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
+    ConstraintDescription: must begin with a letter and contain only alphanumeric
+      characters.
+
+  DBPassword:
+    NoEcho: 'true'
+    Description: The database admin account password
+    Type: String
+    MinLength: '1'
+    MaxLength: '41'
+    AllowedPattern: '[a-zA-Z0-9]+'
+    ConstraintDescription: must contain only alphanumeric characters.
+
+
 Resources:
 
     VPC:
@@ -35,6 +54,7 @@ Resources:
             Parameters:
                 EnvironmentName: !Ref AWS::StackName
                 VPC: !GetAtt VPC.Outputs.VPC
+                PrivateSubnetCIDR: !GetAtt VPC.Outputs.PrivateSubnetCIDR
 
     EC2Instance:
         Type: AWS::CloudFormation::Stack
@@ -47,6 +67,17 @@ Resources:
                 Subnet: !GetAtt VPC.Outputs.PublicSubnet
                 EC2SecurityGroup: !GetAtt SecurityGroups.Outputs.EC2SecurityGroup
                 KeyName: !Ref KeyName
+
+    Database:
+        Type: AWS::CloudFormation::Stack
+        Properties:
+            TemplateURL: https://s3.amazonaws.com/game-analytics-handson-jp/infrastructure/rds.yaml
+            Parameters:
+                EnvironmentName: !Ref AWS::StackName
+                DBSecurityGroup: !GetAtt SecurityGroups.Outputs.DBSecurityGroup
+                PrivateSubnet: !GetAtt VPC.Outputs.PrivateSubnet
+                DBUser: !Ref DBUser
+                DBPassword: !Ref DBPassword
 
 Outputs:
 

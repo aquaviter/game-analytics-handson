@@ -7,62 +7,54 @@ Parameters:
         Description: An environment name that will be prefixed to resource names
         Type: String
 
-    VPC:
-        Type: AWS::EC2::VPC::Id
-        Description: Choose which VPC the Applicaion Load Balancer should be deployed to
+    #VPC:
+    #    Type: AWS::EC2::VPC::Id
+    #    Description: Choose which VPC the Applicaion Load Balancer should be deployed to
 
-    Subnets:
-        Description: Choose which subnets the Applicaion Load Balancer should be deployed to
-        Type: List<AWS::EC2::Subnet::Id>
+    PrivateSubnet:
+        Description: Choose which subnets the RDS should be deployed to
+        Type: AWS::EC2::Subnet::Id
 
-    SecurityGroup:
-        Description: Select the Security Group to apply to the Applicaion Load Balancer
+    DBSecurityGroup:
+        Description: Select the Security Group to apply to the RDS
         Type: AWS::EC2::SecurityGroup::Id
+
+    DBUser:
+        Description: The database admin account username
+        Type: String
+
+    DBPassword:
+        Description: The database admin account password
+        Type: String
 
 Resources:
 
-    LoadBalancer:
-        Type: AWS::ElasticLoadBalancingV2::LoadBalancer
-        Properties:
-            Name: !Ref EnvironmentName
-            Subnets: !Ref Subnets
-            SecurityGroups:
-                - !Ref SecurityGroup
-            Tags:
-                - Key: Name
-                  Value: !Ref EnvironmentName
+  DBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: RDS DB subnet group
+      SubnetIds: !Ref PrivateSubnet
 
-    LoadBalancerListener:
-        Type: AWS::ElasticLoadBalancingV2::Listener
-        Properties:
-            LoadBalancerArn: !Ref LoadBalancer
-            Port: 80
-            Protocol: HTTP
-            DefaultActions:
-                - Type: forward
-                  TargetGroupArn: !Ref DefaultTargetGroup
+  Database:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBName: gamedb
+      AllocatedStorage: 5
+      DBInstanceClass: db.t2.micro
+      Engine: MySQL
+      MasterUsername: !Ref DBUser
+      MasterUserPassword: !Ref DBPassword
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      VPCSecurityGroups: [ !Ref DBSecurityGroup ]
+      DeletionPolicy: Snapshot
+      MultiAZ: false
+      Tags:
+      - Key: Name
+        Value: MySQL Database
 
-    # We define a default target group here, as this is a mandatory Parameters
-    # when creating an Application Load Balancer Listener. This is not used, instead
-    # a target group is created per-service in each service template (../services/*)
-    DefaultTargetGroup:
-        Type: AWS::ElasticLoadBalancingV2::TargetGroup
-        Properties:
-            Name: default
-            VpcId: !Ref VPC
-            Port: 80
-            Protocol: HTTP
 
 Outputs:
 
-    LoadBalancer:
+    RDS:
         Description: A reference to the Application Load Balancer
-        Value: !Ref LoadBalancer
-
-    LoadBalancerUrl:
-        Description: The URL of the ALB
-        Value: !GetAtt LoadBalancer.DNSName
-
-    Listener:
-        Description: A reference to a port 80 listener
-        Value: !Ref LoadBalancerListener
+        Value: !GetAtt [Database, Endpoint.Address]

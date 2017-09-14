@@ -30,6 +30,8 @@ Resources:
     VPC:
         Type: AWS::EC2::VPC
         Properties:
+            EnableDnsSupport: true
+            EnableDnsHostnames: true
             CidrBlock: !Ref VpcCIDR
             Tags:
                 - Key: Name
@@ -119,3 +121,11 @@ Outputs:
     PrivateSubnet:
         Description: A reference to the private subnet in the 1st Availability Zone
         Value: !Ref PrivateSubnet
+
+    PublicSubnetCIDR:
+        Description: A reference to the public subnet CIDR in the 1st Availability Zone
+        Value: !Ref PublicSubnetCIDR
+
+    PrivateSubnetCIDR:
+        Description: A reference to the private subnet CIDR in the 1st Availability Zone
+        Value: !Ref PrivateSubnetCIDR

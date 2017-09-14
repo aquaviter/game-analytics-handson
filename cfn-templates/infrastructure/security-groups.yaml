@@ -12,6 +12,12 @@ Parameters:
         Type: AWS::EC2::VPC::Id
         Description: Choose which VPC the security groups should be deployed to
 
+    PrivateSubnetCIDR:
+        Description: Please enter the IP range (CIDR notation) for the private subnet in the first Availability Zone
+        Type: String
+        Default: 10.192.20.0/24
+
+
 Resources:
 
     # This security group defines who/where is allowed to access the ECS hosts directly.
@@ -32,8 +38,26 @@ Resources:
                 - Key: Name
                   Value: !Sub ${EnvironmentName}-EC2
 
+    DBSecurityGroup:
+      Type: AWS::EC2::SecurityGroup
+      Properties:
+          GroupDescription: Open database for access
+          SecurityGroupIngress:
+            - CidrIp: 10.200.0.0/16
+            #- CidrIp: !Ref PrivateSubnetCIDR
+              IpProtocol: tcp
+              ToPort: 3306
+              FromPort: 3306
+          Tags:
+            - Key: Name
+              Value: !Sub ${EnvironmentName}-Database
+
 Outputs:
 
     EC2SecurityGroup:
         Description: A reference to the security group for EC2
         Value: !Ref EC2SecurityGroup
+
+    DBSecurityGroup:
+        Description: A reference to the security group for DB
+        Value: !Ref DBSecurityGroup
