@@ -61,19 +61,58 @@ Mappings:
         AMI: ami-5ac17f3e
 
 Resources:
-  EC2Instance:
-    Type: AWS::EC2::Instance
-    Properties:
-      AvailabilityZone: !Select [ 0, !GetAZs ]
-      InstanceType: !Ref InstanceType
-      SecurityGroupIds: [ !Ref EC2SecurityGroup ]
-      KeyName: !Ref KeyName
-      ImageId: !FindInMap [AWSRegionToAMI, !Ref "AWS::Region", AMI]
-      SubnetId: !Ref PublicSubnet1
-      Tags:
-        -
-          Key: Name
-          Value: game-server
+    GameServerRole:
+      Type: AWS::IAM::Role
+      Properties:
+          Path: /
+          RoleName: !Sub ${EnvironmentName}-GameServerRole-${AWS::Region}
+          AssumeRolePolicyDocument: |
+              {
+                  "Statement": [{
+                      "Action": "sts:AssumeRole",
+                      "Effect": "Allow",
+                      "Principal": {
+                          "Service": "ec2.amazonaws.com"
+                      }
+                  }]
+              }
+          Policies:
+              - PolicyName: KinesisAgentPolicy
+                PolicyDocument: |
+                  {
+                      "Statement": [{
+                          "Effect": "Allow",
+                          "Action": [
+                            "firehose:DeleteDeliveryStream",
+                            "firehose:PutRecord",
+                            "firehose:PutRecordBatch",
+                            "firehose:UpdateDestination"
+                          ],
+                          "Resource": "*"
+                      }]
+                  }
+
+    GameServerProfile:
+        Type: AWS::IAM::InstanceProfile
+        Properties:
+            Path: /
+            Roles:
+                - !Ref GameServerRole
+
+    EC2Instance:
+      Type: AWS::EC2::Instance
+      Properties:
+        AvailabilityZone: !Select [ 0, !GetAZs ]
+        InstanceType: !Ref InstanceType
+        SecurityGroupIds: [ !Ref EC2SecurityGroup ]
+        KeyName: !Ref KeyName
+        ImageId: !FindInMap [AWSRegionToAMI, !Ref "AWS::Region", AMI]
+        SubnetId: !Ref PublicSubnet1
+        IamInstanceProfile: !Ref GameServerProfile
+        Tags:
+          -
+            Key: Name
+            Value: game-server
 
 Outputs:
 
