@@ -1,1 +1,1 @@
-{ "eventCode": "{{ eventCode }}", "userID":"{{ userID }}", "transactionID":"{{ transactionID }}", , "itemID":"{{ itemID }}", "eventTimestamp":"{{ eventTimestamp }} ", "platform":"{{ platform }}" }
+{ "eventID":"{{ eventID }}", "eventTimestamp":"{{ eventTimestamp }} ", "eventCode": "{{ eventCode }}", "userID":"{{ userID }}", "itemID":"{{ itemID }}", "platform":"{{ platform }}" }

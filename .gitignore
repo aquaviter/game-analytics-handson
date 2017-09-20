@@ -1,1 +1,3 @@
 docs/
+gen_sample.py
+*.csv

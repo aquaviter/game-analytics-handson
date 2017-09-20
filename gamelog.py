@@ -7,18 +7,23 @@ import uuid
 import random
 import logging
 import time
+import string
 
 def get_time():
     """ Get current time: YYYY-mm-dd HH:mm:ss:S """
     now = datetime.now()
     return now.strftime("%Y-%m-%d %H:%M:%S.") + "%04d" % (now.microsecond // 1000)
 
+def gen_rand_str(length, chars=None):
+    return ''.join([random.choice(string.ascii_uppercase) for i in range(length)])
+
+
 # Loading a template file
 env = Environment(loader=FileSystemLoader('./', encoding='utf8'))
 msg_tpl = env.get_template('template.json')
 
 # List
-eventcode_list = ['buy']
+event_code_list = ['buy', 'drop', 'sell']
 platform_list = ["web", "ios", "android"]
 
 # Log file Path
@@ -27,20 +32,21 @@ logging.basicConfig(filename="/tmp/app.log", format="%(message)s", level=logging
 # Generate log with json format
 while(True):
     # Generate IDs
-    event_code = random.choice(eventcode_list)
-    platform = random.choice(platform_list)
-    user_id = 'user' + "%03d" % (random.randint(1,99))
-    item_id = 'item' + "%03d" % (random.randint(1,99))
-    transaction_id = uuid.uuid1()
+    event_code = random.choice(event_code_list)
+    id = random.randint(1,999)
+    user_id = str(id)
+    platform = platform_list[id % 3]
+    event_id = gen_rand_str(4) + "%06d" % (random.randint(0,1000000))
+    item_id = str(random.randint(1,10))
 
     msg = msg_tpl.render({
+    'eventID': event_id,
+    'eventTimestamp': get_time(),
     'eventCode': event_code,
     'userID': user_id,
-    'eventTimestamp': get_time(),
-    'transactionID': transaction_id,
+    'itemID': item_id,
     'platform': platform,
-    'itemID': item_id
     })
     print (msg)
     logging.info(msg)
-    time.sleep(5)
+    time.sleep(1)
