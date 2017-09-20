@@ -60,6 +60,7 @@ Resources:
             InternetGatewayId: !Ref InternetGateway
             VpcId: !Ref VPC
 
+
     PublicSubnet1:
         Type: AWS::EC2::Subnet
         Properties:
@@ -160,6 +161,27 @@ Resources:
             RouteTableId: !Ref PrivateRouteTable2
             SubnetId: !Ref PrivateSubnet2
 
+    S3Endpoint:
+        Type: 'AWS::EC2::VPCEndpoint'
+        Properties:
+            PolicyDocument:
+              Version: 2012-10-17
+              Statement:
+                - Effect: Allow
+                  Principal: '*'
+                  Action:
+                    - 's3:*'
+                  Resource:
+                    - 'arn:aws:s3:::*'
+            RouteTableIds:
+              - !Ref PrivateRouteTable1
+              - !Ref PrivateRouteTable2
+            ServiceName: !Join
+              - ''
+              - - com.amazonaws.
+                - !Ref 'AWS::Region'
+                - .s3
+            VpcId: !Ref VPC
 
 Outputs:
 

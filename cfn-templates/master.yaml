@@ -96,4 +96,4 @@ Outputs:
 
   DBEndpoint:
     Description: A reference to the Database Endpoint
-    Value: !GetAtt RDS.Outputs.DBEnndpoint
+    Value: !GetAtt Database.Outputs.DBEndpoint
