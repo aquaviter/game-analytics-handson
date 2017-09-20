@@ -15,6 +15,10 @@ Parameters:
         Description: Subnets the RDS should be deployed to
         Type: List<AWS::EC2::Subnet::Id>
 
+    VpcCIDR:
+      Description: Please enter the IP range (CIDR notation) for the private subnet in the first Availability Zone
+      Type: String
+
     DBUser:
         Description: The database admin account username
         Type: String
