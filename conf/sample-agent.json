@@ -1,0 +1,12 @@
+{
+  "cloudwatch.emitMetrics": true,
+  "kinesis.endpoint": "",
+  "firehose.endpoint": "",
+
+  "flows": [
+    {
+      "filePattern": "/tmp/app.log*",
+      "deliveryStream": "game-log-from-gamesv"
+    }
+  ]
+}

@@ -17,7 +17,8 @@ def get_time():
 env = Environment(loader=FileSystemLoader('./', encoding='utf8'))
 msg_tpl = env.get_template('template.json')
 
-# Platform List
+# List
+eventcode_list = ['buy']
 platform_list = ["web", "ios", "android"]
 
 # Log file Path
@@ -25,16 +26,20 @@ logging.basicConfig(filename="/tmp/app.log", format="%(message)s", level=logging
 
 # Generate log with json format
 while(True):
+    # Generate IDs
+    event_code = random.choice(eventcode_list)
     platform = random.choice(platform_list)
-    event_code = 'event' + "%02d" % (random.randint(1,99))
-    user_id = 'user' + "%04d" % (random.randint(1,999))
-    session_id = uuid.uuid5(uuid.NAMESPACE_OID, user_id)
+    user_id = 'user' + "%03d" % (random.randint(1,99))
+    item_id = 'item' + "%03d" % (random.randint(1,99))
+    transaction_id = uuid.uuid1()
+
     msg = msg_tpl.render({
     'eventCode': event_code,
     'userID': user_id,
     'eventTimestamp': get_time(),
-    'sessionID': session_id,
-    'platform': platform
+    'transactionID': transaction_id,
+    'platform': platform,
+    'itemID': item_id
     })
     print (msg)
     logging.info(msg)
