@@ -64,6 +64,6 @@ Resources:
 
 Outputs:
 
-    RDS:
-        Description: A reference to the Application Load Balancer
+    DBEndpoint:
+        Description: A reference to the Database Endpoint
         Value: !GetAtt [Database, Endpoint.Address]

@@ -1,3 +1,8 @@
+-- Create Database
+CREATE DATABASE gamelog;
+
+-- Select database
+USE gamelog;
 
 -- Transaction Table
 CREATE TABLE transaction (
