@@ -12,7 +12,7 @@ import string
 def get_time():
     """ Get current time: YYYY-mm-dd HH:mm:ss:S """
     now = datetime.now()
-    return now.strftime("%Y-%m-%d %H:%M:%S.") + "%04d" % (now.microsecond // 1000)
+    return now.isoformat()
 
 def gen_rand_str(length, chars=None):
     return ''.join([random.choice(string.ascii_uppercase) for i in range(length)])

@@ -98,3 +98,7 @@ Outputs:
   DBEndpoint:
     Description: A reference to the Database Endpoint
     Value: !GetAtt Database.Outputs.DBEndpoint
+
+  DBEC2SecurityGroup:
+    Description: A reference to the security group for RDS
+    Value: !GetAtt Database.Outputs.DBEC2SecurityGroup
