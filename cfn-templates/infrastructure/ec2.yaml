@@ -26,7 +26,7 @@ Parameters:
 
   KeyName:
       Description: KeyName for logging into Game Server
-      Type: String
+      Type: AWS::EC2::KeyPair::KeyName
 
 Mappings:
 

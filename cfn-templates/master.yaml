@@ -10,11 +10,8 @@ Parameters:
 
   KeyName:
     Description: EC2 key pair name for bastion host SSH access
-    Type: String
-    MinLength: 1
-    MaxLength: 255
-    AllowedPattern: "[\\x20-\\x7E]*"
-    ConstraintDescription: Key pair name can contain only ASCII characters.
+    Type: AWS::EC2::KeyPair::KeyName
+    ConstraintDescription: Choose your KeyName from the list.
 
   DBUser:
     Description: The database admin account username
