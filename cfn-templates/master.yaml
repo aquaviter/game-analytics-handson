@@ -6,6 +6,24 @@ Description: >
     Last Modified: Sep 15, 2017
     Author: Hideyo Yoshida <hideyy@amazon.co.jp>
 
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      -
+        Label:
+          default: "Game Server Configuration"
+
+        Parameters:
+          - KeyName
+
+      -
+        Label:
+          default: "Database Configuration"
+
+        Parameters:
+          - DBUser
+          - DBPassword
+
 Parameters:
 
   KeyName:
